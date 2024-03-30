@@ -1,0 +1,49 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=827846 to learn about workspace recommendations.
+  // Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+
+  // List of extensions which should be recommended for users of this workspace.
+  "recommendations": [
+    "aaron-bond.better-comments",
+    "ahmadalli.vscode-nginx-conf",
+    "chakrounanas.turbo-console-log",
+    "cweijan.dbclient-jdbc",
+    "cweijan.vscode-office",
+    "cweijan.vscode-redis-client",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "fabiospampinato.vscode-open-multiple-files",
+    "formulahendry.auto-rename-tag",
+    "grapecity.gc-excelviewer",
+    "irongeek.vscode-env",
+    "j-brooke.fracturedjsonvsc",
+    "janisdd.vscode-edit-csv",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-ssh-edit",
+    "ms-vscode.remote-explorer",
+    "ms-vsliveshare.vsliveshare",
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+    "mutsuntsai.jsdoc-link",
+    "myax.short-js-doc",
+    "pkief.material-icon-theme",
+    "postman.postman-for-vscode",
+    "redhat.vscode-yaml",
+    "ronnidc.nunjucks",
+    "shd101wyy.markdown-preview-enhanced",
+    "simonsiefke.svg-preview",
+    "streetsidesoftware.code-spell-checker",
+    "tamasfe.even-better-toml",
+    "the-e3n.block-highlighter",
+    "usernamehw.errorlens",
+    "visualstudioexptteam.vscodeintellicode",
+    "william-voyek.vscode-nginx",
+    "wix.vscode-import-cost",
+    "zaaack.markdown-editor"
+  ],
+  // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
+  "unwantedRecommendations": []
+}
