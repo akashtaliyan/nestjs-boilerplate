@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "target": "ES2021",
+    "lib": ["ES2021", "DOM"],
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "paths": {
+      "@config/*": ["config/*"],
+      "@libs/core": ["libs/core/src"],
+      "@libs/core/*": ["libs/core/src/*"],
+      "@src/*": ["src/*"],
+
+      "@libs/common": ["libs/common/src"],
+      "@libs/common/*": ["libs/common/src/*"],
+      "@libs/users": ["libs/users/src"],
+      "@libs/users/*": ["libs/users/src/*"],
+      "@libs/nestjs-objection": ["libs/nestjs-objection/src"],
+      "@libs/nestjs-objection/*": ["libs/nestjs-objection/src/*"],
+
+      "@libs/nestjs-queue": ["libs/nestjs-queue/src"],
+      "@libs/nestjs-queue/*": ["libs/nestjs-queue/src/*"],
+
+      "@libs/nestjs-storage": ["libs/nestjs-storage/src"],
+      "@libs/nestjs-storage/*": ["libs/nestjs-storage/src/*"],
+      "@libs/nest-mailman": ["libs/nest-mailman/src"],
+      "@libs/nest-mailman/*": ["libs/nest-mailman/src/*"],
+
+      "@libs/nestjs-queue-sqs-driver": ["libs/nestjs-queue-sqs-driver/src"],
+      "@libs/nestjs-queue-sqs-driver/*": ["libs/nestjs-queue-sqs-driver/src/*"],
+
+      "@libs/dropdown": ["libs/dropdown/src"],
+      "@libs/dropdown/*": ["libs/dropdown/src/*"],
+
+      "@libs/vault": ["libs/vault/src"],
+      "@libs/vault/*": ["libs/vault/src/*"],
+      "@libs/nestjs-console": ["libs/nestjs-console/src"],
+      "@libs/nestjs-console/*": ["libs/nestjs-console/src/*"],
+      "@libs/nestjs-events": ["libs/nestjs-events/src"],
+      "@libs/nestjs-events/*": ["libs/nestjs-events/src/*"],
+      "@libs/nestjs-queue-strategy": ["libs/nestjs-queue-strategy/src"],
+      "@libs/nestjs-queue-strategy/*": ["libs/nestjs-queue-strategy/src/*"],
+      "@libs/template-engine": ["libs/template-engine/src"],
+      "@libs/template-engine/*": ["libs/template-engine/src/*"],
+      "@libs/js-forge": ["libs/js-forge/src"],
+      "@libs/js-forge/*": ["libs/js-forge/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

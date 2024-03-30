@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+'use strict';
+const fileName = './dist/src/app';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const core_1 = require('@nestjs/core');
+const yargs = require('yargs');
+
+throwErrorIfFileNotExists('./dist/libs/nestjs-console/src');
+throwErrorIfFileNotExists(`${fileName}.js`);
+
+const console_1 = require('./dist/libs/nestjs-console/src');
+
+const app_1 = require(fileName); // CHANGE THE IMPORT IF NEEDED
+
+async function bootstrap() {
+  const app = await core_1.NestFactory.createApplicationContext(
+    app_1.AppModule,
+    { logger: true },
+  );
+  const argv = yargs.argv;
+  const c = argv._[0];
+  argv.command = c;
+  if (typeof argv.command != 'string') {
+    console_1.Logger.error(' PLEASE ADD A COMMAND ');
+    return process.exit();
+  }
+  const command = console_1.CommandMeta.getCommand(argv.command);
+  if (!command || !command.target) {
+    console_1.Logger.error(` ${argv.command} : command not found `);
+    return process.exit();
+  }
+  await console_1.CommandRunner.handle(command, argv);
+  return process.exit();
+}
+bootstrap();
+
+function throwErrorIfFileNotExists(filepath) {
+  const fs = require('fs');
+
+  let flag = true;
+  try {
+    fs.accessSync(filepath, fs.constants.F_OK);
+  } catch (e) {
+    flag = false;
+  }
+  if (!flag) {
+    throw new Error(`File ${filepath} not found`);
+  }
+  return flag;
+}

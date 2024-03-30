@@ -1,0 +1,1 @@
+export enum VAULT_SERVICE_PATH_IDENTIFIER {}
