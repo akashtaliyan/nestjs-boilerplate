@@ -50,7 +50,10 @@
       "@libs/template-engine": ["libs/template-engine/src"],
       "@libs/template-engine/*": ["libs/template-engine/src/*"],
       "@libs/js-forge": ["libs/js-forge/src"],
-      "@libs/js-forge/*": ["libs/js-forge/src/*"]
+      "@libs/js-forge/*": ["libs/js-forge/src/*"],
+
+      "@libs/jobs": ["libs/jobs/src"],
+      "@libs/jobs/*": ["libs/jobs/src/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

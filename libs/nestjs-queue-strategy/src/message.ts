@@ -11,6 +11,7 @@ export interface JobOptions {
 export interface Message extends JobOptions {
   job: string;
   data: Payload | Payload[];
+  id?: string;
 }
 
 export interface InternalMessage extends Message {

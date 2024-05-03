@@ -1,43 +1,74 @@
-import { Logger } from '@nestjs/common';
-import {
-  DriverJob,
-  InternalMessage,
-  QueueDriver,
-} from '@libs/nestjs-queue-strategy';
+import { ConsoleIO, Logger } from '@libs/nestjs-console';
+import { DriverJob, InternalMessage, QueueDriver } from '.';
+import { JobFailed, JobProcessed, JobProcessing } from './events';
 import { ListenerOptions } from './interfaces';
 import { QueueMetadata } from './metadata';
 import { Dispatch } from './queue';
 
 export class JobRunner {
-  private logger: Logger;
+  private consoleIo: ConsoleIO;
+
   constructor(
     private options: ListenerOptions,
     private connection: QueueDriver,
   ) {
-    this.logger = new Logger('nest-queue');
+    this.consoleIo = new ConsoleIO('', {});
   }
 
   async run(job: DriverJob) {
     const message = this.fetchMessage(job);
+
     const { data } = message;
     try {
+      this.log('info', `LOG [${message.job}] Job Processing...`);
       const targetJob = QueueMetadata.getJob(message.job);
       if (!targetJob || !targetJob.target) return;
-
+      const event = new JobProcessing(message, job);
+      event.emit();
       await targetJob.target(data);
       await this.success(message, job);
+      this.log('success', `LOG [${message.job}] Job Processed`);
     } catch (e) {
-      this.logger.error(e);
+      const event = new JobFailed(message, job);
+      event.emit();
       await this.retry(message, job);
+      const errorMessage = (e as Error).message;
+      this.log(
+        'error',
+        `LOG [${message.job}] Job Failed | Error: ${errorMessage}`,
+      );
     }
   }
 
+  log(level: string, msg: string): void {
+    if (!this.options.logger) return;
+    let logger = undefined;
+    switch (level) {
+      case 'info':
+        logger = Logger.info;
+        break;
+      case 'success':
+        logger = Logger.success;
+        break;
+      case 'error':
+        logger = Logger.error;
+        break;
+      case 'warn':
+        logger = Logger.warn;
+        break;
+    }
+
+    logger && logger(msg);
+  }
+
   /**
-   * Job processed succesfully method
+   * Job processed successfully method
    * @param message
    * @param job
    */
   async success(message: InternalMessage, job: DriverJob): Promise<void> {
+    const event = new JobProcessed(message, job);
+    event.emit();
     await this.removeJobFromQueue(job);
   }
 
