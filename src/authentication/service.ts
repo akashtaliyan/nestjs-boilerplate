@@ -6,13 +6,14 @@ import {
 import { UserModel, UserService } from '@src/user';
 import { LoginWithEmailDto, SignUpEmailDto } from './validators';
 import { JwtService } from '@nestjs/jwt';
+import { comparePassword, hashPassword } from '@src/libs/common/src';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     public userService: UserService,
     private readonly jwtService: JwtService,
-  ) {} // Assuming UserService handles interaction with the user repository
+  ) {} // UserService handles interaction with the user repository
 
   async signUpWithEmail(inputs: SignUpEmailDto): Promise<any> {
     const { firstName, confirmPassword, email, lastName, password } = inputs;
@@ -30,6 +31,7 @@ export class AuthenticationService {
         'User already Exist Please signIn.',
       );
     }
+    const passHash = await hashPassword(password);
 
     // create user
     try {
@@ -38,7 +40,7 @@ export class AuthenticationService {
         lastName,
         email,
         username: email,
-        passwordHash: password,
+        passwordHash: passHash,
       });
 
       return await this.getTokens(user);
@@ -69,10 +71,11 @@ export class AuthenticationService {
     }
 
     // check if password matches
-
-    if (password !== user.passwordHash) {
-      throw new UnprocessableEntityException('Credentials Invalid');
+    const passCheck = await comparePassword(password, user.passwordHash);
+    if (passCheck) {
+      throw new UnprocessableEntityException('Invalid Credentials.');
     }
+
     return await this.getTokens(user);
   }
 
