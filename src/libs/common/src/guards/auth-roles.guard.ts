@@ -11,14 +11,16 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
-import { Request } from '../rest';
+import { Request } from '../../../core/src/rest';
 import moment from 'moment';
+import { UserLibService } from '@src/libs/user/src';
 
 @Injectable()
 export class AuthRolesGuard extends AuthGuard('jwt') {
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService,
+    private userService: UserLibService,
   ) {
     super();
   }

@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { UserSettingsModel } from '@src/user/models/userSettings';
+
 import { DatabaseRepository, InjectModel } from '@libs/nestjs-objection';
 import { UserSettingsRepositoryContract } from './contract';
+import { UserSettingsModel } from '../../models/userSettings';
 
 @Injectable()
 export class UserSettingsRepository

@@ -1,15 +1,16 @@
 import { Request, Response, RestController } from '@libs/core';
 import { Controller, Get, Req, Res } from '@nestjs/common';
-import { UserService } from '../services';
+
 import { UserDetailTransformer } from '@src/transformer';
 import { Dto, Validate } from '@libs/core/validator';
-import { GetUserByIdOrEmailDto } from '../validators';
+
 import { Post } from '@libs/common';
-import { Restricted } from '@libs/core/guards';
+
+import { GetUserByIdOrEmailDto, UserLibService } from '@src/libs/user/src';
 
 @Controller('users')
 export class UserController extends RestController {
-  constructor(private service: UserService) {
+  constructor(private service: UserLibService) {
     super();
   }
 

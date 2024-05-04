@@ -1,4 +1,4 @@
-import { CreateUserDto } from '@src/user';
+import { CreateUserDto } from '@src/libs/user/src';
 import { IsEmail, IsString, Matches, MinLength } from 'class-validator';
 export { CreateUserDto as SignUpEmailDto };
 

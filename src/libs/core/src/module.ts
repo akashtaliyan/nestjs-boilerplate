@@ -1,6 +1,6 @@
 import config from '@config/index';
 import { CacheManagerOptions, CacheModule } from '@nestjs/cache-manager';
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DiscoveryModule } from '@nestjs/core';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
@@ -12,6 +12,7 @@ import { BaseValidator } from './validator';
 import { RequestContext } from './reqContext';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { UserLibModule } from '@src/libs/user/src';
 
 @Global()
 @Module({
@@ -23,6 +24,7 @@ import { PassportModule } from '@nestjs/passport';
       load: config,
     }),
     // Importing CacheModule and passing the RedisOptions from the config file
+
     // CacheModule.registerAsync<CacheManagerOptions>({
     //   imports: [ConfigModule],
     //   isGlobal: true,

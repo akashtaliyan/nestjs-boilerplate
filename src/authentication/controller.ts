@@ -12,8 +12,9 @@ import { AuthenticationService } from './service'; // Assuming you have an Authe
 import { LoginWithEmailDto, SignUpEmailDto } from './validators';
 import { Dto, Validate } from '@libs/core/validator';
 import { Get, IQuickBook, Patch, PermissionEnum, Post } from '@libs/common';
-import { GetUserByIdOrEmailDto } from '@src/user';
+
 import { UserDetailTransformer } from '@src/transformer';
+import { GetUserByIdOrEmailDto } from '@src/libs/user/src';
 
 @Controller('auth')
 export class AuthenticationController extends RestController {

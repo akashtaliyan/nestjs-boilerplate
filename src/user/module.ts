@@ -1,18 +1,13 @@
+import { CoreModule } from '@libs/core';
 import { Module } from '@nestjs/common';
 import { UserController } from './controllers';
-import { UserService } from './services';
-import { UserModuleConstants } from './constants';
-import { UserRepository } from './repositories';
-import { GreetUser } from './commands';
+
+import { UserLibModule } from '@src/libs/user/src';
 
 @Module({
-  imports: [],
+  imports: [UserLibModule],
   controllers: [UserController],
-  providers: [
-    UserService,
-    GreetUser,
-    { provide: UserModuleConstants.userRepo, useClass: UserRepository },
-  ],
-  exports: [UserService],
+  providers: [],
+  exports: [],
 })
 export class UserModule {}

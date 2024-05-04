@@ -3,15 +3,16 @@ import {
   Inject,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { UserModel, UserService } from '@src/user';
+
 import { LoginWithEmailDto, SignUpEmailDto } from './validators';
 import { JwtService } from '@nestjs/jwt';
 import { comparePassword, hashPassword } from '@src/libs/common/src';
+import { UserModel, UserLibService } from '@src/libs/user/src';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
-    public userService: UserService,
+    public userService: UserLibService,
     private readonly jwtService: JwtService,
   ) {} // UserService handles interaction with the user repository
 
@@ -72,7 +73,7 @@ export class AuthenticationService {
 
     // check if password matches
     const passCheck = await comparePassword(password, user.passwordHash);
-    if (passCheck) {
+    if (!passCheck) {
       throw new UnprocessableEntityException('Invalid Credentials.');
     }
 

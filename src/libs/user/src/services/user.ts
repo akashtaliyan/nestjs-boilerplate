@@ -5,13 +5,13 @@ import {
 } from '@nestjs/common';
 import { UserRepositoryContract } from '../repositories';
 import { ListensTo } from '@libs/nestjs-events';
-import { UserSignedUp } from '../events/userSignedUp';
-import { UserModuleConstants } from '../constants';
+
 import { UserModel } from '../models';
 import { CreateUserDto } from '../validators';
+import { UserModuleConstants } from '../constants';
 
 @Injectable()
-export class UserService {
+export class UserLibService {
   constructor(
     @Inject(UserModuleConstants.userRepo)
     public usersRepo: UserRepositoryContract,

@@ -16,30 +16,24 @@
       "@config/*": ["config/*"],
       "@libs/core": ["src/libs/core/src"],
       "@libs/core/*": ["src/libs/core/src/*"],
-
       "@libs/common": ["src/libs/common/src"],
       "@libs/common/*": ["src/libs/common/src/*"],
       "@libs/users": ["src/libs/users/src"],
       "@libs/users/*": ["src/libs/users/src/*"],
       "@libs/nestjs-objection": ["src/libs/nestjs-objection/src"],
       "@libs/nestjs-objection/*": ["src/libs/nestjs-objection/src/*"],
-
       "@libs/nestjs-queue": ["src/libs/nestjs-queue/src"],
       "@libs/nestjs-queue/*": ["src/libs/nestjs-queue/src/*"],
-
       "@libs/nestjs-storage": ["src/libs/nestjs-storage/src"],
       "@libs/nestjs-storage/*": ["src/libs/nestjs-storage/src/*"],
       "@libs/nest-mailman": ["src/libs/nest-mailman/src"],
       "@libs/nest-mailman/*": ["src/libs/nest-mailman/src/*"],
-
       "@libs/nestjs-queue-sqs-driver": ["src/libs/nestjs-queue-sqs-driver/src"],
       "@libs/nestjs-queue-sqs-driver/*": [
         "src/libs/nestjs-queue-sqs-driver/src/*"
       ],
-
       "@libs/dropdown": ["src/libs/dropdown/src"],
       "@libs/dropdown/*": ["src/libs/dropdown/src/*"],
-
       "@libs/vault": ["src/libs/vault/src"],
       "@libs/vault/*": ["src/libs/vault/src/*"],
       "@libs/nestjs-console": ["src/libs/nestjs-console/src"],
@@ -52,10 +46,11 @@
       "@libs/template-engine/*": ["src/libs/template-engine/src/*"],
       "@libs/js-forge": ["src/libs/js-forge/src"],
       "@libs/js-forge/*": ["src/libs/js-forge/src/*"],
-
       "@libs/jobs": ["src/libs/jobs/src"],
       "@libs/jobs/*": ["src/libs/jobs/src/*"],
-      "@src/*": ["src/*"]
+      "@src/*": ["src/*"],
+      "@libs/user": ["src/libs/user/src"],
+      "@libs/user/*": ["src/libs/user/src/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

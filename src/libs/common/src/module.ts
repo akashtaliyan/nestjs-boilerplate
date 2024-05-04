@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { UserLibModule } from '@src/libs/user/src';
 
 @Module({
-  imports: [],
+  imports: [UserLibModule],
   providers: [],
   exports: [],
 })
