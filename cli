@@ -6,10 +6,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const core_1 = require('@nestjs/core');
 const yargs = require('yargs');
 
-throwErrorIfFileNotExists('./dist/libs/nestjs-console/src');
+throwErrorIfFileNotExists('./dist/src/libs/nestjs-console/src');
 throwErrorIfFileNotExists(`${fileName}.js`);
 
-const console_1 = require('./dist/libs/nestjs-console/src');
+const console_1 = require('./dist/src/libs/nestjs-console/src');
 
 const app_1 = require(fileName); // CHANGE THE IMPORT IF NEEDED
 

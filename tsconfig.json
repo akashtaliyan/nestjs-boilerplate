@@ -16,7 +16,6 @@
       "@config/*": ["config/*"],
       "@libs/core": ["src/libs/core/src"],
       "@libs/core/*": ["src/libs/core/src/*"],
-      "@src/*": ["src/*"],
 
       "@libs/common": ["src/libs/common/src"],
       "@libs/common/*": ["src/libs/common/src/*"],
@@ -55,7 +54,8 @@
       "@libs/js-forge/*": ["src/libs/js-forge/src/*"],
 
       "@libs/jobs": ["src/libs/jobs/src"],
-      "@libs/jobs/*": ["src/libs/jobs/src/*"]
+      "@libs/jobs/*": ["src/libs/jobs/src/*"],
+      "@src/*": ["src/*"]
     }
   },
   "exclude": ["node_modules", "dist"]
