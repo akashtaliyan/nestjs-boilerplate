@@ -1,3 +1,4 @@
-export * from './user/contract';
-export * from './user/database';
+export * from './user';
+export * from './roles';
+export * from './roles-user-mapping';
 export * from './userSettings';

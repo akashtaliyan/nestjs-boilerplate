@@ -21,4 +21,8 @@ export class GreetUser {
     _cli.info('User Greeted');
     return;
   }
+
+  // create roles "ADMIN", "USER", "SUPER_ADMIN"
+
+  // create user with admin role
 }

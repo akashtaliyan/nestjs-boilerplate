@@ -7,6 +7,7 @@ import { Dto, Validate } from '@libs/core/validator';
 import { Post } from '@libs/common';
 
 import { GetUserByIdOrEmailDto, UserLibService } from '@src/libs/user/src';
+import { UserPermissions } from '@libs/common/guards';
 
 @Controller('users')
 export class UserController extends RestController {
@@ -15,22 +16,9 @@ export class UserController extends RestController {
   }
 
   @Get('/profile')
-  // @Restricted('ADMIN', 'USER', 'GUEST')
-  async getProfile(
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<Response> {
-    console.log(req.user);
-    return res.success(req.user);
-  }
-  @Post('/profile')
-  @Validate(GetUserByIdOrEmailDto)
-  async set(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Dto() inputs: GetUserByIdOrEmailDto,
-  ): Promise<Response> {
-    const user = await this.service.getUserByIdOrEmail(inputs);
-    return res.success(user);
+  @UserPermissions('USER')
+  async getProfile(@Req() req: Request, @Res() res: Response) {
+    const user = await this.service.getMyProfile(req?.user?.uuid);
+    res.success(await this.transform(user, new UserDetailTransformer()));
   }
 }

@@ -4,3 +4,5 @@ export * from './common';
 export * from './caching';
 
 export * from './vault';
+
+export * from './roles';

@@ -1,4 +1,6 @@
+import { User$Model } from '@libs/common';
 import { Transformer } from '@libs/core';
+import { UserModel } from '@src/libs/user/src';
 
 export class UserDetailTransformer extends Transformer {
   // availableIncludes = ['extra', 'address', 'pin'];
@@ -11,6 +13,7 @@ export class UserDetailTransformer extends Transformer {
       lastName: user.lastName,
       email: user.email,
       username: user.email,
+      designation: user.designation ? user.designation : '',
     };
   }
 

@@ -1,21 +1,31 @@
-import {
-  Injectable,
-  Inject,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { UserRepositoryContract } from '../repositories';
-import { ListensTo } from '@libs/nestjs-events';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 
-import { UserModel } from '../models';
-import { CreateUserDto } from '../validators';
-import { UserModuleConstants } from '../constants';
+import { RolesModel, UserModel, UserRolesMappingModel } from '../models';
+import {
+  RolesRepository,
+  UserRepository,
+  UserRolesMappingRepository,
+  UserSettingsRepository,
+} from '../repositories';
 
 @Injectable()
 export class UserLibService {
   constructor(
-    @Inject(UserModuleConstants.userRepo)
-    public usersRepo: UserRepositoryContract,
+    public usersRepo: UserRepository,
+    public userRolesRepo: UserRolesMappingRepository,
+    public rolesRepo: RolesRepository,
+    public userSettingsRepo: UserSettingsRepository,
   ) {}
+
+  async getMyProfile(id: string): Promise<UserModel> {
+    const user = await this.usersRepo.firstWhere({ uuid: id }, false);
+    if (!user) {
+      throw new UnprocessableEntityException(
+        'No user found with the provided email. Please verify the email and try again.',
+      );
+    }
+    return user;
+  }
 
   async getUserByIdOrEmail({
     id,
@@ -62,5 +72,18 @@ export class UserLibService {
     throw new UnprocessableEntityException(
       'Unable to retrieve user information. Please provide a valid ID or email.',
     );
+  }
+
+  async getUserRoles(userId: string) {
+    const rolesMaps = (await this.userRolesRepo
+      .query()
+      .where('userId', userId)
+      .withGraphFetched({ role: true })) as any as UserRolesMappingModel[];
+
+    const roles = [];
+    for (const roleMap of rolesMaps) {
+      roles.push(roleMap.role.name);
+    }
+    return roles;
   }
 }

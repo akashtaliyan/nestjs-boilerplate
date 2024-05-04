@@ -3,14 +3,23 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CoreModule } from '@libs/core';
 import { UserLibService } from './services';
 import { GreetUser } from './commands';
-import { UserRepository } from './repositories';
+
 import { UserModuleConstants } from './constants';
+import {
+  RolesRepository,
+  UserRepository,
+  UserRolesMappingRepository,
+  UserSettingsRepository,
+} from './repositories';
 
 @Module({
   providers: [
     UserLibService,
     GreetUser,
-    { provide: UserModuleConstants.userRepo, useClass: UserRepository },
+    RolesRepository,
+    UserRepository,
+    UserRolesMappingRepository,
+    UserSettingsRepository,
   ],
   exports: [UserLibService],
 })
