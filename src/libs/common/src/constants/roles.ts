@@ -1,6 +1,10 @@
 // Roles COnstants
+// customer, crew, office, partner & owner
 export const ROLES = {
-  USER: 'USER',
-  ADMIN: 'ADMIN',
   SUPER_ADMIN: 'SUPER_ADMIN',
+  CUSTOMER: 'CUSTOMER',
+  CREW: 'CREW',
+  OFFICE: 'OFFICE',
+  PARTNER: 'PARTNER',
+  OWNER: 'OWNER',
 };
