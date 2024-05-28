@@ -58,7 +58,7 @@ export class AuthConsoleCommand {
     }
     const rolesMapping = await this.userService.userRolesRepo.firstWhere(
       {
-        roleId: roleId.uuid,
+        roleId: roleId.id,
       },
       false,
     );
@@ -98,8 +98,8 @@ export class AuthConsoleCommand {
 
       await this.userService.userRolesRepo.create(
         {
-          roleId: roleId.uuid,
-          userId: user.uuid,
+          userId: user.id,
+          roleId: roleId.id,
         },
         trx,
       );

@@ -7,9 +7,9 @@ export class UserRolesMappingModel extends BaseModel {
 
   uuid?: string;
 
-  userId?: string;
+  userId?: number;
 
-  roleId?: string;
+  roleId?: number;
 
   meta?: Record<string, any>;
 
@@ -25,7 +25,7 @@ export class UserRolesMappingModel extends BaseModel {
         modelClass: UserModel,
         join: {
           from: 'user_roles_mapping.userId',
-          to: 'users.uuid',
+          to: 'users.id',
         },
       },
       role: {
@@ -33,7 +33,7 @@ export class UserRolesMappingModel extends BaseModel {
         modelClass: RolesModel,
         join: {
           from: 'user_roles_mapping.roleId',
-          to: 'roles.uuid',
+          to: 'roles.id',
         },
       },
     };

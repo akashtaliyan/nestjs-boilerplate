@@ -78,7 +78,7 @@ export class RolesManageService {
     try {
       // first delete the user roles mapping
       await this.userService.userRolesRepo.deleteWhere({
-        roleId: id,
+        roleId: roleExists.id,
       });
       // then delete the role
       await this.userService.rolesRepo.deleteWhere({
@@ -120,8 +120,8 @@ export class RolesManageService {
     // check if the user already has the role
     const userHasRole = await this.userService.userRolesRepo.firstWhere(
       {
-        userId: userId,
-        roleId: roleId,
+        userId: userExists.id,
+        roleId: roleExists.id,
       },
       false,
     );
@@ -131,8 +131,8 @@ export class RolesManageService {
 
     // create user role mapping
     await this.userService.userRolesRepo.create({
-      userId: userId,
-      roleId: roleId,
+      userId: userExists.id,
+      roleId: roleExists.id,
     });
 
     return 'Role assigned successfully.';
@@ -166,8 +166,8 @@ export class RolesManageService {
     // check if the user has the role
     const userHasRole = await this.userService.userRolesRepo.firstWhere(
       {
-        userId: userId,
-        roleId: roleId,
+        userId: userExists.id,
+        roleId: roleExists.id,
       },
       false,
     );
@@ -177,8 +177,8 @@ export class RolesManageService {
 
     // delete user role mapping
     await this.userService.userRolesRepo.deleteWhere({
-      userId: userId,
-      roleId: roleId,
+      userId: userExists.id,
+      roleId: roleExists.id,
     });
 
     return 'Role revoked successfully.';

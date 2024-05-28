@@ -6,6 +6,7 @@ import {
   UserRepository,
   UserRolesMappingRepository,
   UserSettingsRepository,
+  UsersTokensRepository,
 } from '../repositories';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class UserLibService {
     public userRolesRepo: UserRolesMappingRepository,
     public rolesRepo: RolesRepository,
     public userSettingsRepo: UserSettingsRepository,
+    public usersTokensRepo: UsersTokensRepository,
   ) {}
 
   async getMyProfile(id: string): Promise<UserModel> {
@@ -24,6 +26,8 @@ export class UserLibService {
         'No user found with the provided email. Please verify the email and try again.',
       );
     }
+
+    await user.$fetchGraph({ roles: true });
     return user;
   }
 
@@ -74,7 +78,7 @@ export class UserLibService {
     );
   }
 
-  async getUserRoles(userId: string) {
+  async getUserRoles(userId: number) {
     const rolesMaps = (await this.userRolesRepo
       .query()
       .where('userId', userId)

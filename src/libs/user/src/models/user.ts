@@ -1,4 +1,5 @@
 import { BaseModel } from '@libs/nestjs-objection';
+import { RolesModel } from './roles';
 
 export class UserModel extends BaseModel {
   static tableName = 'users';
@@ -24,6 +25,23 @@ export class UserModel extends BaseModel {
   meta?: Record<string, any>;
   createdAt?: Date;
   updatedAt?: Date;
+
+  static get relationMappings() {
+    return {
+      roles: {
+        relation: BaseModel.ManyToManyRelation,
+        modelClass: RolesModel,
+        join: {
+          from: 'users.id',
+          through: {
+            from: 'user_roles_mapping.userId',
+            to: 'user_roles_mapping.roleId',
+          },
+          to: 'roles.id',
+        },
+      },
+    };
+  }
 }
 
 export enum PROVIDERS_ENUM {

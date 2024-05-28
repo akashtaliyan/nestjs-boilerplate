@@ -8,6 +8,7 @@ import { LoginWithEmailDto, SignUpEmailDto } from './validators';
 import { JwtService } from '@nestjs/jwt';
 import { comparePassword, hashPassword } from '@src/libs/common/src';
 import { UserModel, UserLibService } from '@src/libs/user/src';
+import moment from 'moment';
 
 @Injectable()
 export class AuthenticationService {
@@ -17,7 +18,7 @@ export class AuthenticationService {
   ) {} // UserService handles interaction with the user repository
 
   async signUpWithEmail(inputs: SignUpEmailDto): Promise<any> {
-    const { firstName, confirmPassword, email, lastName, password } = inputs;
+    const { firstName, email, lastName, password } = inputs;
 
     // check if user is already signedUP.
 
@@ -43,7 +44,6 @@ export class AuthenticationService {
         username: email,
         passwordHash: passHash,
       });
-
       return await this.getTokens(user);
     } catch (error) {
       console.log(
@@ -98,8 +98,18 @@ export class AuthenticationService {
     };
     const token = this.jwtService.sign(payload);
 
+    // Return the access token and refresh token and store it in the db
+    await this.userService.usersTokensRepo.create({
+      userId: user.uuid,
+      token: token,
+      lastUsed: moment().toDate(),
+      expiryDate: moment().add(7, 'days').toDate(),
+      meta: {},
+      isExpired: false,
+    });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: token,
       refresh_token: this.generateRefreshToken(user), // Generate the refresh token
     };
   }
@@ -114,7 +124,7 @@ export class AuthenticationService {
       email: user.email,
     };
     return this.jwtService.sign(payload, {
-      expiresIn: '7d', // Refresh token expiry time
+      expiresIn: '365d', // Refresh token expiry time
       secret: process.env.JWT_REFRESH_SECRET || 'JWT_REFRESH_SECRET', // Separate secret for refresh token
     });
   }

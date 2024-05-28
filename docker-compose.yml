@@ -1,0 +1,10 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:pg16
+    ports:
+      - 5432:5432
+    volumes:
+      - ${HOME}/dockerData/pgdata:/data
+    environment:
+      - POSTGRES_PASSWORD=Akash@123
+    container_name: timescaledb

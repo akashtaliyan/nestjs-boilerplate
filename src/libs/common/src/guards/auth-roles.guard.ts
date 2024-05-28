@@ -9,11 +9,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JsonWebTokenError, JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
-import { Request } from '../../../core/src/rest';
 import { UserLibService } from '@src/libs/user/src';
-import { RolesGuard } from './roles.guards';
+import { Observable } from 'rxjs';
 import { ROLES_KEY } from '.';
+import { Request } from '../../../core/src/rest';
 
 @Injectable()
 export class AuthRolesGuard extends AuthGuard('jwt') {
@@ -48,8 +47,50 @@ export class AuthRolesGuard extends AuthGuard('jwt') {
         if (!validToken) {
           throw new Error('Invalid token.');
         }
+
         req.user = validToken;
         req.user.uuid = validToken.sub;
+        // check the user token in the db
+        const isValidToken = await this.userService.usersTokensRepo.firstWhere({
+          token,
+          userId: validToken.sub,
+        });
+        if (!isValidToken) {
+          throw new UnauthorizedException('Invalid token.');
+        }
+        if (isValidToken.isExpired) {
+          throw new TokenExpiredError(
+            'Token expired.',
+            isValidToken.expiryDate,
+          );
+        }
+        // get user
+        const currentUser = await this.userService.usersRepo.firstWhere(
+          { uuid: validToken.sub },
+          false,
+        );
+        if (!currentUser) throw new UnauthorizedException('Invalid token.');
+        req.currentUser = currentUser;
+
+        // check for the roles on req
+        const roles = this.reflector.get<string[]>(
+          ROLES_KEY,
+          context.getHandler(),
+        );
+        if (!roles) {
+          return true;
+        }
+        const userRoles = await this.userService.getUserRoles(currentUser.id);
+        // check if user is super admin
+        if (userRoles.includes('SUPER_ADMIN')) {
+          return true;
+        }
+        const hasRole = roles.some((role) => userRoles.includes(role));
+        if (!hasRole) {
+          throw new UnauthorizedException(
+            'You do not have permission to access this resource.',
+          );
+        }
       } catch (error) {
         if (error instanceof TokenExpiredError) {
           throw new UnauthorizedException('Token expired. please login again.');
@@ -61,6 +102,11 @@ export class AuthRolesGuard extends AuthGuard('jwt') {
         throw error;
       }
     }
+    // add token last used as now
+    await this.userService.usersTokensRepo.update(
+      { token, userId: req.user.uuid },
+      { lastUsed: new Date() },
+    );
     return true;
   }
 }
@@ -73,6 +119,6 @@ export class AuthRolesGuard extends AuthGuard('jwt') {
 export const UserPermissions = (...roles: string[]) => {
   return applyDecorators(
     SetMetadata(ROLES_KEY, roles),
-    UseGuards(AuthRolesGuard, RolesGuard),
+    UseGuards(AuthRolesGuard),
   );
 };

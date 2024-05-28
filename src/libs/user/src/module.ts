@@ -10,6 +10,7 @@ import {
   UserRepository,
   UserRolesMappingRepository,
   UserSettingsRepository,
+  UsersTokensRepository,
 } from './repositories';
 
 @Module({
@@ -20,6 +21,7 @@ import {
     UserRepository,
     UserRolesMappingRepository,
     UserSettingsRepository,
+    UsersTokensRepository,
   ],
   exports: [UserLibService],
 })
