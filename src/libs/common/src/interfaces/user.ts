@@ -9,8 +9,6 @@ export interface IUser {
   designation?: string;
   isEmailVerified?: boolean;
   idp?: string;
-  isCompanyPic?: boolean;
-  isAssetPic?: boolean;
   isDeleted?: boolean;
   meta?: Record<string, any>;
   createdAt?: Date;

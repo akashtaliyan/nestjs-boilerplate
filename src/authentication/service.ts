@@ -6,15 +6,21 @@ import {
 
 import { LoginWithEmailDto, SignUpEmailDto } from './validators';
 import { JwtService } from '@nestjs/jwt';
-import { comparePassword, hashPassword } from '@src/libs/common/src';
+import {
+  ITokenPayload,
+  comparePassword,
+  hashPassword,
+} from '@src/libs/common/src';
 import { UserModel, UserLibService } from '@src/libs/user/src';
 import moment from 'moment';
+import { RequestContext } from '@libs/core';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     public userService: UserLibService,
     private readonly jwtService: JwtService,
+    private readonly reqContext: RequestContext,
   ) {} // UserService handles interaction with the user repository
 
   async signUpWithEmail(inputs: SignUpEmailDto): Promise<any> {
@@ -88,33 +94,14 @@ export class AuthenticationService {
 
   // Implement other methods as needed
   async getTokens(user: UserModel) {
-    const payload = {
-      username: user.username,
-      sub: user.uuid,
-      name: user.firstName + ' ' + user.lastName,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-    };
-    const token = this.jwtService.sign(payload);
-
-    // Return the access token and refresh token and store it in the db
-    await this.userService.usersTokensRepo.create({
-      userId: user.uuid,
-      token: token,
-      lastUsed: moment().toDate(),
-      expiryDate: moment().add(7, 'days').toDate(),
-      meta: {},
-      isExpired: false,
-    });
+    const token = await this.getToken(this.getTokenPayload(user));
 
     return {
       access_token: token,
       refresh_token: this.generateRefreshToken(user), // Generate the refresh token
     };
   }
-
-  generateRefreshToken(user: UserModel) {
+  getTokenPayload(user: UserModel): ITokenPayload {
     const payload = {
       username: user.username,
       sub: user.uuid,
@@ -123,15 +110,52 @@ export class AuthenticationService {
       lastName: user.lastName,
       email: user.email,
     };
-    return this.jwtService.sign(payload, {
+    return payload;
+  }
+
+  // Generate the access token
+  async getToken(payload: ITokenPayload) {
+    const token = this.jwtService.sign(payload);
+    const decodedToken = this.jwtService.decode(token);
+
+    const expiryDate = moment(decodedToken.exp * 1000);
+    // Return the access token and refresh token and store it in the db
+    await this.userService.usersTokensRepo.create({
+      userId: payload.sub,
+      token: token,
+      lastUsed: moment().toDate(),
+      expiryDate: expiryDate.toDate(),
+      meta: {},
+      isExpired: false,
+    });
+    return token;
+  }
+
+  generateRefreshToken(user: UserModel) {
+    return this.jwtService.sign(this.getTokenPayload(user), {
       expiresIn: '365d', // Refresh token expiry time
       secret: process.env.JWT_REFRESH_SECRET || 'JWT_REFRESH_SECRET', // Separate secret for refresh token
     });
   }
 
-  async refreshToken(token: string) {
-    // Decode the refresh token, verify the expiry and signature
-    // Optionally check against a list of tokens you have stored in a DB
-    // Create a new access token and return it
+  async refreshToken() {
+    const user = this.reqContext.req.currentUser as UserModel;
+
+    // update the old token to disabled
+    return { access_token: await this.getToken(this.getTokenPayload(user)) };
+  }
+
+  async logout() {
+    const user = this.reqContext.req.currentUser as UserModel;
+    const token = this.reqContext.req?.['access_token'];
+    if (!token) {
+      return { message: 'Already logged out' };
+    }
+    // update the old token to expired
+    await this.userService.usersTokensRepo.updateWhere(
+      { userId: user.uuid, token: token },
+      { isExpired: true },
+    );
+    return { message: 'Logged out successfully' };
   }
 }

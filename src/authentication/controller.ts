@@ -1,19 +1,12 @@
-import {
-  Controller,
-  Delete,
-  NotFoundException,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Get, Post, ROLES } from '@libs/common';
+import { Request, Response, RestController } from '@libs/core';
+import { Dto, Validate } from '@libs/core/validator';
+import { Controller, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response, RestController, UseTransaction } from '@libs/core';
 import { AuthenticationService } from './service'; // Assuming you have an AuthenticationService
 import { LoginWithEmailDto, SignUpEmailDto } from './validators';
-import { Dto, Validate } from '@libs/core/validator';
-import { Get, IQuickBook, Patch, PermissionEnum, Post } from '@libs/common';
 
-import { UserDetailTransformer } from '@src/transformer';
+import { RefreshTokenPermissions, UserPermissions } from '@libs/common/guards';
 import { GetUserByIdOrEmailDto } from '@src/libs/user/src';
 
 @Controller('auth')
@@ -44,14 +37,21 @@ export class AuthenticationController extends RestController {
     return res.success(await this.authenticationService.loginWithEmail(inputs));
   }
 
-  // @UseGuards(JwtRefreshGuard)
-  // @Post('refresh')
-  // async refresh(@Req() req: Request) {
-  //   return req.user;
-  // }
+  @Post('refresh-token')
+  @RefreshTokenPermissions()
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    return res.success(await this.authenticationService.refreshToken());
+  }
+
+  @Post('logout')
+  @UserPermissions(...Object.values(ROLES))
+  async logout(@Req() req: Request, @Res() res: Response) {
+    return res.success(await this.authenticationService.logout());
+  }
 
   @Get('/profile')
   @Validate(GetUserByIdOrEmailDto)
+  @UserPermissions(...Object.values(ROLES))
   async getProfile(
     @Req() req: Request,
     @Res() res: Response,

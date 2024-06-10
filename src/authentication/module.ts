@@ -10,7 +10,14 @@ import { RolesManageService, RolesManagementController } from './admin';
 import { AuthConsoleCommand } from './console';
 
 @Module({
-  imports: [UserLibModule],
+  imports: [
+    UserLibModule,
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_ACCESS_TOKEN_SECRET,
+      signOptions: { expiresIn: '7d' },
+    }),
+  ],
   controllers: [AuthenticationController, RolesManagementController],
   providers: [
     AuthenticationService,

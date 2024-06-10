@@ -64,7 +64,6 @@ export class RestServer {
       origin: [
         'http://localhost:3000',
         'http://localhost:3001',
-        'http://192.168.1.9:3000',
       ],
     });
 

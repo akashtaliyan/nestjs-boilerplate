@@ -7,6 +7,7 @@ export class UserModel extends BaseModel {
   uuid?: string;
 
   username?: string;
+  imageUrl?: string;
 
   firstName?: string;
   lastName?: string;
@@ -21,6 +22,8 @@ export class UserModel extends BaseModel {
   isDeleted?: boolean;
 
   provider?: PROVIDERS_ENUM;
+
+  roles?: RolesModel[];
 
   meta?: Record<string, any>;
   createdAt?: Date;
