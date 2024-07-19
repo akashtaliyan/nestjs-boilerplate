@@ -1,8 +1,16 @@
-import { VAULT_SERVICE_PATH_IDENTIFIER, getVaultPath } from '@libs/common';
+import {
+  EXTERNAL_PROVIDERS,
+  OauthUrlDto,
+  VAULT_SERVICE_PATH_IDENTIFIER,
+  getVaultPath,
+  getVaultPathForExternalAccount,
+} from '@libs/common';
 import { VaultService } from '@libs/vault';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Auth, google } from 'googleapis';
+import { ExternalAccountRepository } from '../repositories';
+import { RequestContext } from '@libs/core';
 
 /**
  * Service class to handle APIs related to external integrations.
@@ -10,10 +18,11 @@ import { Auth, google } from 'googleapis';
 @Injectable()
 export class ExternalAccountLibService {
   private googleOauth2Client: Auth.OAuth2Client;
-
   constructor(
     private config: ConfigService,
     private vaultService: VaultService,
+    public externalAccountRepository: ExternalAccountRepository,
+    private _ctx: RequestContext,
   ) {
     this.initializeOAuthClient();
   }
@@ -61,15 +70,6 @@ export class ExternalAccountLibService {
     const userInfo = await gmail.users.getProfile({
       userId: 'me',
     });
-    // Check if the user is authorized
-    // if (
-    //   userInfo.data.emailAddress !==
-    //   this.config.get('google.accaciaBillReaderEmail')
-    // ) {
-    //   throw new UnprocessableEntityException(
-    //     'Invalid email. Please use the correct bill-reader email to authorize.',
-    //   );
-    // }
     // check if refresh token is present
     if (!tokens.refresh_token) {
       throw new UnprocessableEntityException(
@@ -78,17 +78,42 @@ export class ExternalAccountLibService {
     }
 
     // Save token to vault
+    const user = this._ctx.user;
+    // check if the user already has this account linked
+    const existingAccount = await this.externalAccountRepository.getWhere(
+      {
+        userId: user.id,
+        provider: EXTERNAL_PROVIDERS.GOOGLE,
+        email: userInfo.data.emailAddress,
+      },
+      false,
+    );
+    if (existingAccount.length > 0) {
+      throw new UnprocessableEntityException('This Account already linked.');
+    }
+    const trx = await this.externalAccountRepository.transaction();
     try {
+      // create entry in external account table
+      const account = await this.externalAccountRepository.create(
+        {
+          userId: user.id,
+          provider: EXTERNAL_PROVIDERS.GOOGLE,
+          email: userInfo.data.emailAddress,
+          isExpired: false,
+          externalId: userInfo.data.emailAddress,
+          meta: { externalUser: userInfo },
+        },
+        trx,
+      );
       await this.vaultService.writeSecret(
-        getVaultPath(
-          VAULT_SERVICE_PATH_IDENTIFIER.UTILITY_GMAIL,
-          'oauth2Token',
-        ),
+        getVaultPathForExternalAccount(user.uuid, userInfo.data.emailAddress),
         tokens,
       );
+      await trx.commit();
       return 'Token saved successfully';
     } catch (error) {
       console.error('Error saving token to vault', error);
+      await trx.rollback();
       throw new UnprocessableEntityException(
         'Error saving token. Please try again.',
       );
@@ -100,23 +125,23 @@ export class ExternalAccountLibService {
    * @returns An array of service accounts.
    */
   async listServiceAccounts() {
-    // For now, we have only Google service account for email reading
-    const email = this.config.get('google.accaciaBillReaderEmail');
-    //
-    const vaultPath = getVaultPath(
-      VAULT_SERVICE_PATH_IDENTIFIER.UTILITY_GMAIL,
-      'oauth2Token',
-    );
-    const token = await this.vaultService.readSecret(vaultPath);
-    const connectUrl = this.generateAuthUrl();
-    const serviceAccounts = [
+    const user = this._ctx.user;
+    console.log(user);
+    const accounts = await this.externalAccountRepository.getWhere(
       {
-        provider: 'google',
-        accountEmail: email,
-        connected: !!token,
-        ...(!token && { connectUrl }),
+        userId: user.id,
       },
-    ];
-    return serviceAccounts;
+      false,
+    );
+    return accounts;
+  }
+
+  async getAuthUrl(inputs: OauthUrlDto) {
+    switch (inputs.provider) {
+      case EXTERNAL_PROVIDERS.GOOGLE:
+        return this.generateAuthUrl();
+      default:
+        return '';
+    }
   }
 }

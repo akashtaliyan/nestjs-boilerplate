@@ -8,6 +8,7 @@ import { VaultModule } from '@libs/vault';
 import { ObjectionModule } from '@libs/nestjs-objection';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { QueueModule } from '@libs/nestjs-queue';
+import { UserLibModule } from '@src/libs/user/src';
 
 @Module({
   imports: [
@@ -15,12 +16,14 @@ import { QueueModule } from '@libs/nestjs-queue';
     ConsoleModule,
     ScheduleModule.forRoot(),
     VaultModule,
-    ObjectionModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => config.get('db'),
-      inject: [ConfigService],
-    }),
+    ConfigModule,
+    // ObjectionModule.registerAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   useFactory: (config: ConfigService) => config.get('db'),
+    //   inject: [ConfigService],
+    // }),
+    UserLibModule,
     QueueModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],

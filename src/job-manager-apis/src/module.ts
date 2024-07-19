@@ -10,20 +10,18 @@ import { JobsManagerApisController, JobsManagerApisService } from './admin';
 @Module({
   imports: [
     // UsersLibModule,
-
-    ObjectionModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => config.get('db'),
-      inject: [ConfigService],
-    }),
+    // ObjectionModule.registerAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   useFactory: (config: ConfigService) => config.get('db'),
+    //   inject: [ConfigService],
+    // }),
     QueueModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => config.get('queue'),
       inject: [ConfigService],
     }),
-    JobsModule,
   ],
   controllers: [JobsManagerApisController],
   providers: [JobsManagerApisService],

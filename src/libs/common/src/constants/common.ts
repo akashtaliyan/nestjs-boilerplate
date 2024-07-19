@@ -33,3 +33,9 @@ export const STATIC_FILE_INTERCEPTOR_OPTIONS = {
   // 500 mb limit
   limits: { fileSize: 500 * 1024 * 1024 },
 };
+
+export const EXTERNAL_PROVIDERS = {
+  GOOGLE: 'google',
+  // FACEBOOK: 'facebook',
+  // LINKEDIN: 'linkedin',
+};

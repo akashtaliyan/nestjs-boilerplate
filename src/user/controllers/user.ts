@@ -4,7 +4,7 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import { UserDetailTransformer } from '@src/transformer';
 import { Dto, Validate } from '@libs/core/validator';
 
-import { Oauth2CallbackDto, Post, ROLES } from '@libs/common';
+import { Oauth2CallbackDto, OauthUrlDto, Post, ROLES } from '@libs/common';
 
 import {
   ExternalAccountLibService,
@@ -44,5 +44,23 @@ export class UserController extends RestController {
     @Dto() inputs: Oauth2CallbackDto,
   ) {
     res.success(await this.extAccService.getTokenFromCode(inputs.code));
+  }
+
+  @Get('external-accounts')
+  @UserPermissions(...Object.values(ROLES))
+  async getExternalAccounts(@Req() req: Request, @Res() res: Response) {
+    const accounts = await this.extAccService.listServiceAccounts();
+    res.success(accounts);
+  }
+  @Get(':provider/auth-url')
+  @UserPermissions(...Object.values(ROLES))
+  @Validate(OauthUrlDto)
+  async getAuthUrl(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Dto() inputs: OauthUrlDto,
+  ) {
+    const authUrl = await this.extAccService.getAuthUrl(inputs);
+    res.success({ authUrl });
   }
 }

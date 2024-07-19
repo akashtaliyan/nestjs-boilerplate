@@ -8,7 +8,7 @@ const tableName = 'users_tokens';
 
 exports.up = function (knex) {
   return knex.schema.createTable(tableName, function (table) {
-    table.increments('id').primary();
+    table.bigIncrements('id');
 
     table.string('user_id').notNullable();
     table.text('token').notNullable();

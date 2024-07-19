@@ -4,9 +4,10 @@ import { UserController } from './controllers';
 
 import { UserLibModule } from '@src/libs/user/src';
 import { UserAdminApiService, UserAdminController } from './admin';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserLibModule],
+  imports: [UserLibModule, ConfigModule],
   controllers: [UserController, UserAdminController],
   providers: [UserAdminApiService],
   exports: [],

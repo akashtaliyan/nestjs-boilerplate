@@ -1,28 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { Command, ConsoleIO } from '@libs/nestjs-console';
+import { ExternalAccountLibService } from '../services';
+
+import { GMAIL_JOBS } from '@libs/common';
+import { Dispatch } from '@libs/nestjs-queue';
+import { GmailLibService } from '../services/gmail';
 
 @Injectable()
-@Command('user:greet {name}', { desc: 'Command to greet a user' })
 export class GreetUser {
-  public async handle(_cli: ConsoleIO): Promise<void> {
-    const name = _cli.argument<string>('name');
+  constructor(
+    public externalAccountLibService: ExternalAccountLibService,
+    private gmailService: GmailLibService,
+  ) {}
+  @Command('TriggerReadEmail', {
+    desc: 'Trigger read email job',
+  })
+  public async TriggerEmail(_cli: ConsoleIO): Promise<void> {
+    console.log('Triggering email job');
+    // get list All of the external_accounts
+    const externalAccounts =
+      await this.externalAccountLibService.externalAccountRepository.all();
 
-    // print success message
-    _cli.success(
-      `Hello ${name}, enjoy building cool stuff with this boilerplate! 😁`,
-    );
+    for (const account of externalAccounts) {
+      // check if the account is enabled
+      await account.$fetchGraph({ user: true });
 
-    _cli.table([
-      { name: 'User 1', designation: 'Software Engineer L1' },
-      { name: 'User 2', designation: 'Software Engineer L1' },
-    ]);
-
-    // print info message
-    _cli.info('User Greeted');
-    return;
+      await this.gmailService.fetchEmails(account, true);
+      break;
+    }
   }
-
-  // create roles "ADMIN", "USER", "SUPER_ADMIN"
-
-  // create user with admin role
 }

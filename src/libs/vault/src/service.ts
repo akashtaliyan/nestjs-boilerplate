@@ -6,7 +6,7 @@ import Vault from 'node-vault';
 @Injectable()
 export class VaultService {
   private vaultClient: Vault.client;
-
+  static client: Vault.client;
   constructor(private configService: ConfigService) {
     const vaultHost = this.configService.get<string>('vault.vaultUrl');
     const vaultToken = this.configService.get<string>('vault.vaultToken');
@@ -18,6 +18,7 @@ export class VaultService {
     };
 
     this.vaultClient = Vault(options);
+    VaultService.client = this.vaultClient;
   }
 
   async readSecret<T>(path: string): Promise<T | null> {
@@ -36,6 +37,7 @@ export class VaultService {
     try {
       await this.vaultClient.write(`${path}`, data);
     } catch (error) {
+      console.log(`🚀 - VaultService - error:`, error);
       throw new Error(`Error writing secret to Vault: ${error.message}`);
     }
   }

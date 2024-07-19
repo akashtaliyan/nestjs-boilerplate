@@ -6,6 +6,8 @@ import { GreetUser } from './commands';
 
 import { UserModuleConstants } from './constants';
 import {
+  EmailTokensRepository,
+  ExternalAccountRepository,
   RolesRepository,
   UserRepository,
   UserRolesMappingRepository,
@@ -13,10 +15,13 @@ import {
   UsersTokensRepository,
 } from './repositories';
 import { VaultModule } from '@libs/vault';
+import { ConfigModule } from '@nestjs/config';
+import { GmailLibService } from './services/gmail';
 
 @Module({
   imports: [VaultModule],
   providers: [
+    ConfigModule,
     UserLibService,
     GreetUser,
     RolesRepository,
@@ -24,8 +29,11 @@ import { VaultModule } from '@libs/vault';
     UserRolesMappingRepository,
     UserSettingsRepository,
     UsersTokensRepository,
+    ExternalAccountRepository,
     ExternalAccountLibService,
+    GmailLibService,
+    EmailTokensRepository,
   ],
-  exports: [UserLibService, ExternalAccountLibService],
+  exports: [UserLibService, ExternalAccountLibService, GmailLibService],
 })
 export class UserLibModule {}

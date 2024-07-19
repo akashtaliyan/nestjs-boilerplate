@@ -20,15 +20,12 @@ import { COMMON_JOBS } from '@libs/common';
 
 @Injectable()
 export class JobsService {
-  private dbConn: Knex<any, any[]>;
   constructor(
     @Inject(JobTrackerConstants.JobTrackerRepo)
     public readonly jobTrackerRepo: JobTrackerRepository,
     @Inject(JobTrackerConstants.JobLogsRepo)
     public readonly jobLogRepo: JobLogRepository,
-  ) {
-    this.dbConn = ObjectionService.connection();
-  }
+  ) {}
   /**
    * get all jobs or with specific filters
    */

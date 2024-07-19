@@ -1,20 +1,19 @@
-import { Module } from '@nestjs/common';
-import { JobsService } from './services';
-import { JobTrackerConstants } from './constants';
-import { JobTrackerRepository } from './repositories/JobTracker';
-import { JobLogRepository } from './repositories';
-import { QueueModule } from '@libs/nestjs-queue';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ObjectionModule } from '@libs/nestjs-objection';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JobTrackerConstants } from './constants';
+import { JobLogRepository } from './repositories';
+import { JobTrackerRepository } from './repositories/JobTracker';
+import { JobsService } from './services';
 
 @Module({
   imports: [
-    ObjectionModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => config.get('db'),
-      inject: [ConfigService],
-    }),
+    // ObjectionModule.registerAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   useFactory: (config: ConfigService) => config.get('db'),
+    //   inject: [ConfigService],
+    // }),
   ],
   providers: [
     JobsService,

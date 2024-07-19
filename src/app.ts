@@ -11,6 +11,12 @@ import { AuthenticationModule } from './authentication/module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { NotificationsModule } from './notifications';
+import { CronCaptainModule } from './cron-captain/src/module';
+import { QueueModule } from '@libs/nestjs-queue';
+import { JobsModule } from '@libs/jobs';
+import { GmailJobs } from './Jobs/gmailJobs';
+import { UserLibModule } from './libs/user/src';
+import { JobManagerApisModule } from './job-manager-apis/src/module';
 
 @Module({
   imports: [
@@ -26,15 +32,25 @@ import { NotificationsModule } from './notifications';
       signOptions: { expiresIn: '15m' }, // Access token expiry time
       global: true,
     }),
+    QueueModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => config.get('queue'),
+      inject: [ConfigService],
+    }),
     CoreModule,
     UserModule,
     EventModule,
     ConsoleModule,
     AuthenticationModule,
     NotificationsModule,
+    { global: true, module: JobsModule },
+    JobManagerApisModule,
+    CronCaptainModule,
+    UserLibModule,
   ],
 
   controllers: [MainController],
-  providers: [],
+  providers: [GmailJobs],
 })
 export class AppModule {}

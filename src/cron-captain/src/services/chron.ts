@@ -1,12 +1,18 @@
 /**
  * Service responsible for handling cron jobs related to Docubox.
  */
-import { VAULT_SERVICE_PATH_IDENTIFIER, getVaultPath } from '@libs/common';
+import {
+  GMAIL_JOBS,
+  VAULT_SERVICE_PATH_IDENTIFIER,
+  getVaultPath,
+} from '@libs/common';
+import { Dispatch } from '@libs/nestjs-queue';
 
 import { VaultService } from '@libs/vault';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ExternalAccountLibService, UserLibService } from '@src/libs/user/src';
 import { Auth, google } from 'googleapis';
 
 @Injectable()
@@ -17,6 +23,8 @@ export class CronService {
   constructor(
     private readonly vaultService: VaultService,
     private config: ConfigService,
+    private userLibService: UserLibService,
+    private externalAccountLibService: ExternalAccountLibService,
   ) {
     this.initializeGmailAPI();
   }
@@ -24,10 +32,28 @@ export class CronService {
   /**
    * Cron job that reads and processes Docubox emails.
    */
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_DAY_AT_10AM)
   async readAndProcessDocuboxEmails() {
     this.logger.log('Fetching emails');
-    await this.getRecentEmails();
+
+    // get list All of the external_accounts
+    const externalAccounts =
+      await this.externalAccountLibService.externalAccountRepository.all();
+
+    for (const account of externalAccounts) {
+      // check if the account is enabled
+      await account.$fetchGraph({ user: true });
+      console.log(
+        `🚀 - CronService - readAndProcessDocuboxEmails - account:`,
+        account,
+      );
+      // Dispatch({
+      //   job: GMAIL_JOBS.FETCH_EMAILS,
+      //   data: account,
+      // });
+    }
+
+    // await this.getRecentEmails();
   }
 
   /**

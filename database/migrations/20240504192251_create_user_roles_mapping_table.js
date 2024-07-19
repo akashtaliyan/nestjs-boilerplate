@@ -7,7 +7,7 @@ const tableName = 'user_roles_mapping';
  */
 exports.up = function (knex) {
   return knex.schema.createTable(tableName, function (table) {
-    table.increments('id').primary();
+    table.bigIncrements('id');
     table.bigInteger('user_id').notNullable();
     table.bigInteger('role_id').notNullable();
     table.jsonb('meta');
