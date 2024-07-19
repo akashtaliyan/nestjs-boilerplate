@@ -10,6 +10,7 @@ import { MainController } from './controller';
 import { AuthenticationModule } from './authentication/module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { NotificationsModule } from './notifications';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PassportModule } from '@nestjs/passport';
     EventModule,
     ConsoleModule,
     AuthenticationModule,
+    NotificationsModule,
   ],
 
   controllers: [MainController],

@@ -4,14 +4,21 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import { UserDetailTransformer } from '@src/transformer';
 import { Dto, Validate } from '@libs/core/validator';
 
-import { Post, ROLES } from '@libs/common';
+import { Oauth2CallbackDto, Post, ROLES } from '@libs/common';
 
-import { GetUserByIdOrEmailDto, UserLibService } from '@src/libs/user/src';
+import {
+  ExternalAccountLibService,
+  GetUserByIdOrEmailDto,
+  UserLibService,
+} from '@src/libs/user/src';
 import { UserPermissions } from '@libs/common/guards';
 
 @Controller('users')
 export class UserController extends RestController {
-  constructor(private service: UserLibService) {
+  constructor(
+    private service: UserLibService,
+    private extAccService: ExternalAccountLibService,
+  ) {
     super();
   }
 
@@ -20,5 +27,22 @@ export class UserController extends RestController {
   async getProfile(@Req() req: Request, @Res() res: Response) {
     const user = await this.service.getMyProfile(req?.user?.uuid);
     res.success(await this.transform(user, new UserDetailTransformer()));
+  }
+
+  /**
+   * Endpoint for handling OAuth2 callback.
+   * @param req - The request object.
+   * @param res - The response object.
+   * @param inputs - The inputs for the OAuth2 callback.
+   */
+  @Post(':provider/oauth2callback')
+  @Validate(Oauth2CallbackDto)
+  @UserPermissions(...Object.values(ROLES))
+  async oauth2callback(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Dto() inputs: Oauth2CallbackDto,
+  ) {
+    res.success(await this.extAccService.getTokenFromCode(inputs.code));
   }
 }
