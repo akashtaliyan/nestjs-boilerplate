@@ -36,6 +36,34 @@ export class AuthConsoleCommand {
     console.log('ROLES CREATED SUCCESSFULLY, ');
     _cli.table([]);
   }
+  @Command('UPDATE:roles', {
+    desc: 'Command to add default roles',
+  })
+  public async UpdateDefaultRoles(_cli: ConsoleIO): Promise<void> {
+    const roles: Array<{ name: string }> = Object.values(ROLES).map((role) => {
+      return {
+        name: role,
+      };
+    });
+    const trx = await this.userService.rolesRepo.transaction();
+
+    try {
+      for (const role of roles) {
+        await this.userService.rolesRepo.createOrUpdate(role, role, trx);
+      }
+      await trx.commit();
+    } catch (error) {
+      console.log(
+        `🚀 - AuthConsoleCommand - UpdateDefaultRoles - error:`,
+        error,
+      );
+      await trx.rollback();
+      _cli.error('Error while updating roles');
+      return;
+    }
+    console.log('ROLES UPDATED SUCCESSFULLY');
+    _cli.table([]);
+  }
 
   @Command('ADD:superUser', {
     desc: 'Command to add super user',

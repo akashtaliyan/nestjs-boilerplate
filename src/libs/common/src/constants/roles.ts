@@ -7,6 +7,8 @@ export const ROLES = {
   OFFICE: 'OFFICE',
   PARTNER: 'PARTNER',
   OWNER: 'OWNER',
+  USER: 'USER',
+  ADMIN: 'ADMIN',
 };
 
 export interface ITokenPayload {

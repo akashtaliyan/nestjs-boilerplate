@@ -8,6 +8,8 @@ import {
   UserSettingsRepository,
   UsersTokensRepository,
 } from '../repositories';
+import { CreateUpdateAdminUserDto } from '../validators';
+import { hashPassword, ROLES } from '@libs/common';
 
 @Injectable()
 export class UserLibService {
@@ -89,5 +91,81 @@ export class UserLibService {
       roles.push(roleMap.role.name);
     }
     return roles;
+  }
+
+  // create or Update user
+
+  async createUpdateUser(inputs: CreateUpdateAdminUserDto) {
+    const { email, firstName, id, lastName, password, roles } = inputs;
+
+    const trx = await this.rolesRepo.transaction();
+    const dbRoles = await this.rolesRepo.all();
+    const rolesMap = {};
+
+    for (const role of dbRoles) {
+      rolesMap[role.name] = role.id;
+    }
+    // update user
+    if (id) {
+      const user = await this.usersRepo.firstWhere({ uuid: id });
+      if (!user) {
+        throw new UnprocessableEntityException('User not found');
+      }
+      try {
+        await this.usersRepo.update(
+          { uuid: id },
+          { firstName, lastName, email },
+          trx,
+        );
+
+        await this.userRolesRepo.deleteWhere({ userId: user.id }, trx);
+
+        for (const role of roles) {
+          await this.userRolesRepo.create(
+            {
+              userId: user.id,
+              roleId: rolesMap[role],
+            },
+            trx,
+          );
+        }
+        await trx.commit();
+        return user;
+      } catch (error) {
+        console.log(`🚀 - UserLibService - createUpdateUser - error:`, error);
+        await trx.rollback();
+        throw new UnprocessableEntityException('Error while updating user');
+      }
+    }
+
+    // create user
+    try {
+      const passHash = await hashPassword(password);
+      const user = await this.usersRepo.create(
+        {
+          firstName,
+          lastName,
+          email,
+          username: email,
+          passwordHash: passHash,
+        },
+        trx,
+      );
+      // assign super admin role to user
+      for (const role of roles) {
+        await this.userRolesRepo.create(
+          {
+            userId: user.id,
+            roleId: rolesMap[role],
+          },
+          trx,
+        );
+      }
+      await trx.commit();
+    } catch (error) {
+      await trx.rollback();
+      console.log(`🚀 - UserLibService - createUpdateUser - error:`, error);
+      throw new UnprocessableEntityException('Error while creating user');
+    }
   }
 }
